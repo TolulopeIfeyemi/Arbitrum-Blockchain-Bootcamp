@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
-// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-// import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-// import "@openzeppelin/contracts/utils/Counters.sol";
-// import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract NFTMarketplace is ERC721URIStorage, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+contract Marketplace is ERC721URIStorage, Ownable {
+    uint256 private _currentTokenId = 0;
 
     struct NFT {
         uint256 id;
@@ -21,9 +19,13 @@ contract NFTMarketplace is ERC721URIStorage, Ownable {
 
     constructor() ERC721("NFT Marketplace", "NFTM") Ownable(msg.sender) {}
 
+    function _incrementTokenId() private {
+        _currentTokenId++;
+    }
+
     function mint(string memory tokenURI, uint256 price) public onlyOwner {
-        _tokenIds.increment();
-        uint256 newItemId = _tokenIds.current();
+        _incrementTokenId();
+        uint256 newItemId = _currentTokenId;
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
         nfts[newItemId] = NFT(newItemId, tokenURI, price, true);
